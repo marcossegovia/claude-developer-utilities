@@ -1,0 +1,121 @@
+{
+  "merge_summary": {
+    "status": "completed",
+    "strategy": "backward_compatible_union",
+    "conflicts_resolved": 3,
+    "new_endpoints_added": 2,
+    "schemas_merged": 2,
+    "breaking_changes": 0
+  },
+  "conflict_resolutions": [
+    {
+      "conflict_id": "users_get_endpoint_params",
+      "severity": "HIGH",
+      "type": "endpoint_parameter_conflict",
+      "location": "paths./users.get.parameters",
+      "description": "Main file has no parameters, candidate adds status and limit parameters",
+      "resolution_strategy": "EXTEND_OPTIONAL",
+      "decision": "Added new parameters as optional to maintain backward compatibility",
+      "details": {
+        "main_parameters": [],
+        "candidate_parameters": ["status", "limit"],
+        "merged_parameters": ["status (optional)", "limit (optional)"],
+        "backward_compatible": true
+      }
+    },
+    {
+      "conflict_id": "user_schema_required_fields",
+      "severity": "HIGH", 
+      "type": "schema_required_field_conflict",
+      "location": "components.schemas.User.required",
+      "description": "Main requires [id, email, name], candidate requires [id, email, username, status]",
+      "resolution_strategy": "PRESERVE_MAIN_EXTEND_OPTIONAL",
+      "decision": "Kept main required fields, added candidate fields as optional",
+      "details": {
+        "main_required": ["id", "email", "name"],
+        "candidate_required": ["id", "email", "username", "status"],
+        "merged_required": ["id", "email", "name"],
+        "added_optional": ["username", "status", "lastLoginAt"],
+        "backward_compatible": true
+      }
+    },
+    {
+      "conflict_id": "order_item_schema_properties",
+      "severity": "MEDIUM",
+      "type": "schema_property_conflict", 
+      "location": "components.schemas.OrderItem",
+      "description": "Property name change: price -> unitPrice, new discount field, missing price in candidate",
+      "resolution_strategy": "UNION_WITH_LEGACY_SUPPORT",
+      "decision": "Kept legacy 'price' field as required, added new fields as optional",
+      "details": {
+        "main_properties": ["productId", "quantity", "price"],
+        "candidate_properties": ["productId", "quantity", "unitPrice", "discount", "taxAmount"],
+        "merged_properties": ["productId", "quantity", "price (legacy)", "unitPrice (new)", "discount", "taxAmount"],
+        "legacy_fields_preserved": ["price"],
+        "backward_compatible": true
+      }
+    }
+  ],
+  "new_additions": [
+    {
+      "type": "endpoint",
+      "location": "paths./products",
+      "description": "Added complete /products endpoint with GET and POST operations",
+      "source": "candidate"
+    },
+    {
+      "type": "endpoint", 
+      "location": "paths./notifications",
+      "description": "Added /notifications GET endpoint",
+      "source": "candidate"
+    },
+    {
+      "type": "schema",
+      "location": "components.schemas.Product",
+      "description": "Added Product schema",
+      "source": "candidate"
+    },
+    {
+      "type": "schema",
+      "location": "components.schemas.CreateProductRequest", 
+      "description": "Added CreateProductRequest schema",
+      "source": "candidate"
+    },
+    {
+      "type": "schema",
+      "location": "components.schemas.Notification",
+      "description": "Added Notification schema", 
+      "source": "candidate"
+    }
+  ],
+  "backward_compatibility": {
+    "maintained": true,
+    "breaking_changes": [],
+    "deprecated_fields": [
+      {
+        "field": "OrderItem.price",
+        "reason": "Replaced by unitPrice for better clarity",
+        "migration_path": "Use unitPrice instead of price for new implementations"
+      }
+    ],
+    "compatibility_notes": [
+      "All existing API calls will continue to work without modification",
+      "New optional parameters in GET /users provide enhanced filtering without breaking existing clients",
+      "User schema maintains original required fields while adding new optional fields",
+      "OrderItem maintains legacy price field while providing new unitPrice field"
+    ]
+  },
+  "validation_results": {
+    "openapi_valid": true,
+    "schema_references_valid": true,
+    "circular_dependencies": false,
+    "required_fields_consistent": true,
+    "enum_constraints_valid": true
+  },
+  "recommendations": [
+    "Consider deprecating OrderItem.price field in favor of unitPrice in future API version",
+    "Update API documentation to highlight new optional parameters and fields",
+    "Implement migration guide for clients wanting to adopt new features",
+    "Consider adding API versioning strategy for future breaking changes"
+  ]
+}
