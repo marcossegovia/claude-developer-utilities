@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Merged API
-  description: Intelligently merged API specification maintaining backward compatibility
+  title: Main API
+  description: Main publicly exposed API with merged enhancements
   version: 1.1.0
 servers:
   - url: https://api.example.com/v1
@@ -14,21 +14,16 @@ paths:
       tags:
         - Users
       parameters:
-        # Making new parameters optional to maintain backward compatibility
         - name: status
           in: query
-          required: false
           schema:
             type: string
             enum: [active, inactive, pending]
-          description: Filter users by status (new optional parameter)
         - name: limit
           in: query
-          required: false
           schema:
             type: integer
             default: 20
-          description: Maximum number of users to return (new optional parameter)
       responses:
         '200':
           description: Successful response
@@ -144,9 +139,7 @@ components:
       required:
         - id
         - email
-        # Keeping 'name' as required for backward compatibility
         - name
-        # Making new fields optional to avoid breaking changes
       properties:
         id:
           type: string
@@ -156,20 +149,18 @@ components:
           format: email
         name:
           type: string
-          description: User's display name (required for backward compatibility)
-        # New optional fields from candidate
         username:
           type: string
           minLength: 3
-          description: Unique username (optional, new field)
+          description: "Optional username field for enhanced user identification"
         status:
           type: string
           enum: [active, inactive, pending]
-          description: User status (optional, new field)
+          description: "User status - optional for backward compatibility"
         lastLoginAt:
           type: string
           format: date-time
-          description: Last login timestamp (optional, new field)
+          description: "Last login timestamp"
         createdAt:
           type: string
           format: date-time
@@ -185,16 +176,15 @@ components:
           format: email
         name:
           type: string
-        # Optional new fields
         username:
           type: string
           minLength: 3
-          description: Unique username (optional)
+          description: "Optional username for user identification"
         status:
           type: string
           enum: [active, inactive, pending]
           default: active
-          description: Initial user status (optional, defaults to active)
+          description: "Initial user status, defaults to active"
         
     Order:
       type: object
@@ -225,7 +215,6 @@ components:
       required:
         - productId
         - quantity
-        # Keeping legacy 'price' field required for backward compatibility
         - price
       properties:
         productId:
@@ -234,25 +223,23 @@ components:
         quantity:
           type: integer
           minimum: 1
-        # Legacy field maintained for backward compatibility
         price:
           type: number
           format: float
-          description: Item price (legacy field, use unitPrice for new implementations)
-        # New fields from candidate (optional to maintain compatibility)
+          description: "Item price (legacy field name maintained for compatibility)"
         unitPrice:
           type: number
           format: float
-          description: Unit price per item (preferred over legacy price field)
+          description: "Unit price per item (enhanced field)"
         discount:
           type: number
           format: float
           default: 0.0
-          description: Discount amount applied to this item
+          description: "Discount amount applied to this item"
         taxAmount:
           type: number
           format: float
-          description: Tax amount for this item
+          description: "Tax amount for this item"
 
     Product:
       type: object
